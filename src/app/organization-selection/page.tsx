@@ -1,15 +1,30 @@
+import { OrganizationList } from "@clerk/nextjs";
 import { auth } from "@clerk/nextjs/server";
-import OrganizationSelection from "~/components/organization-selection";
+import { redirect } from "next/navigation";
 
 export default async function OrganizationSelectionPage({
   searchParams
 }: {
   searchParams: { redirect_url: string }
 }) {
-  const { userId, orgId } = auth()
+  const { orgId } = auth()
 
-  console.log('search params:', searchParams.redirect_url)
-  return <OrganizationSelection />
+  if (orgId) {
+    // If the orgId is truthy, then redirect the user to the redirect_url if present
+    if (searchParams.redirect_url) {
+      redirect(searchParams.redirect_url)
+    }
+
+    // If there is no redirect_url, redirect to /dashboard
+    redirect("/dashboard")
+
+  }
+  return (
+    <>
+      <h1>Select an organization</h1>
+      <OrganizationList hidePersonal />
+    </>
+  )
 
 }
 
